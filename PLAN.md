@@ -113,13 +113,6 @@ Writing code is cheap. Making software is expensive (for now):
 - git operations
 - ...
 
-**Microsoft Cowork, Claude Cowork, Codex App**
-
-- cleaning up calendar
-- rescheduling meetings
-- reading/editing documents
-- making slides/report
-
 **Concrete Examples**
 
 - this slides (tedious)
@@ -150,6 +143,13 @@ Similar to debugging.
 
 - Encode structured, predictable parts into executable scripts
 - Leave AI only the hard-to-automate, unpredictable parts
+
+**Microsoft Cowork, Claude Cowork, Codex App**
+
+- cleaning up calendar
+- rescheduling meetings
+- reading/editing documents
+- making slides/report
 
 ---
 
@@ -190,12 +190,12 @@ Cost, intelligence, subscriptions, 5-hour/weekly limits
 - GitHub Copilot
 - Z.AI: GLM 5
 - MiniMax: MiniMax M2.5
-- OpenRouter
 
 Agregators
 
 - Cursor
 - Augment Code
+- OpenRouter
 
 Privacy.
 

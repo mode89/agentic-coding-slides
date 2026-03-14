@@ -50,8 +50,6 @@ style: |
 
 # Agentic Coding
 
-A practical introduction for software engineers
-
 ---
 
 ## What is Agentic Coding?
@@ -61,9 +59,8 @@ A practical introduction for software engineers
 Agentic coding is using AI coding agents to automate software development tasks. Instead of writing code yourself, you describe the task in natural language and let the agent do the work. The agent can read files, run commands, edit code — all autonomously. You review the results and provide feedback until the task is complete.
 
 - Coding agent
-- AI coding assistant
-- Autonomous coding agent
 - Coding harness
+- Coding assistant
 
 ---
 
@@ -72,6 +69,16 @@ section { text-align: center; align-content: center; padding: 0 60px; }
 </style>
 
 ![w:500](diagrams/claude.png) ![w:500](diagrams/opencode.png)
+
+---
+
+# Agenda
+
+- Under The Hood
+- Best Practices
+- Use Cases
+- Models & Providers
+- Tooling
 
 ---
 
@@ -86,13 +93,13 @@ section {
   display: flex;
   flex-direction: row;
   gap: 20px;
-  padding: 100px 60px 60px;
+  padding: 120px 80px 80px;
 }
 pre {
   flex: 1;
-  font-size: 0.6em;
+  font-size: 0.55em;
   margin: 0;
-  height: 500px;
+  height: 480px;
 }
 </style>
 
@@ -133,13 +140,13 @@ section {
   display: flex;
   flex-direction: row;
   gap: 20px;
-  padding: 100px 60px 60px;
+  padding: 120px 80px 80px;
 }
 pre {
   flex: 1;
-  font-size: 0.6em;
+  font-size: 0.55em;
   margin: 0;
-  height: 500px;
+  height: 480px;
 }
 .hl {
   font-weight: bold;
@@ -189,13 +196,13 @@ section {
   display: flex;
   flex-direction: row;
   gap: 20px;
-  padding: 100px 60px 60px;
+  padding: 120px 80px 80px;
 }
 pre {
   flex: 1;
-  font-size: 0.6em;
+  font-size: 0.55em;
   margin: 0;
-  height: 500px;
+  height: 480px;
 }
 .hl {
   font-weight: bold;
@@ -243,13 +250,13 @@ section {
   display: flex;
   flex-direction: row;
   gap: 20px;
-  padding: 100px 60px 60px;
+  padding: 120px 80px 80px;
 }
 pre {
   flex: 1;
-  font-size: 0.6em;
+  font-size: 0.55em;
   margin: 0;
-  height: 500px;
+  height: 480px;
 }
 .hl {
   font-weight: bold;
@@ -303,13 +310,13 @@ section {
   display: flex;
   flex-direction: row;
   gap: 20px;
-  padding: 100px 60px 60px;
+  padding: 120px 80px 80px;
 }
 pre {
   flex: 1;
-  font-size: 0.6em;
+  font-size: 0.55em;
   margin: 0;
-  height: 500px;
+  height: 480px;
 }
 .hl {
   font-weight: bold;
@@ -371,30 +378,32 @@ while True:
 
 ## Context
 
-**Includes**
-
 - System instructions
 - Tool definitions
 - Complete conversation history
 
 **Context Window**
 
-- Amount of information the model can consider at once
-- Limited by model architecture
-- 200k - 1M tokens
-- 1 token ~ 3 characters of code
+Amount of information the model can consider at once.
+Limited by model architecture, 200k - 1M tokens.
+
+**Context Rot**
+
+As conversation history grows, model starts losing track of earlier information, leading to mistakes and hallucinations.
 
 ---
 
-## Compaction
+## System Instructions
 
-**Context rot**: as conversation history grows, model starts losing track of earlier information, leading to mistakes and hallucinations.
+- Coding harness: personality, behavior, rules, safety constraints
+- `~/.opencode/AGENTS.md` — personal preferences across all projects
+- `AGENTS.md` — repo-specific instructions:
+  - dev commands
+  - conventions
+  - coding style
+  - rough repo map
 
-**Compaction** summarizes current chat history to free up space while preserving key information.
-
-- Automatic — triggered when context usage gets high
-- Lossy — details are lost, only summaries remain
-- Resets the model's "working memory"
+**Keep small. Update only when model consistently makes mistakes.**
 
 ---
 
@@ -402,14 +411,15 @@ while True:
 
 Some tools can be invoked directly from the user prompt using slash commands.
 
-- `/clear` — reset conversation history
-- `/compact` — trigger compaction manually
-- `/rewind` — undo recent messages to recover context
+- `/clear` — start new session
+- `/rewind` — undo recent messages to recover context (has shortcut)
 - `/resume` — resume an old session
+- `/context` — context usage and token breakdown (status line)
+- `/plan` — enable Plan Mode (has shortcut)
 
 ---
 
-## Custom Slash Commands
+## Slash Commands
 
 Reusable prompts can be defined as custom slash commands.
 
@@ -430,28 +440,41 @@ description: Commit modified files
 
 ---
 
+<!-- _class: "" -->
+<style scoped>
+pre { font-size: 0.75em; }
+</style>
+
 ## Skills
 
 Instructions for specific tasks that can be invoked by the model when relevant.
 
 ```
-.claude/skills/<skill>/
+.claude/skills/pptx/
   SKILL.md
   references/
+    pptx-format.md
   scripts/
+    md_to_pptx.py
 ```
 
 `SKILL.md` appended to the context only when model decides it is relevant.
 
-Example: `.claude/skills/rosbag2/SKILL.md`
-
 ```markdown
 ---
-description: Instructions for working with rosbag2 files.
+description: Use this skill whenever you need to create `.pptx`
 ---
 
-rosbag2 is a tool for ...
+PPTX format is described in `references/pptx-format.md`.
+Use `scripts/md_to_pptx.py` to convert markdown to PPTX.
 ```
+
+---
+
+## Skills
+
+- https://github.com/anthropics/skills - `skill-creator`
+- https://github.com/obra/superpowers
 
 ---
 
@@ -467,42 +490,8 @@ Examples:
 - Reading documentation
 - Summarizing long outputs
 
----
-
-## AGENTS.md
-
-Provides system instructions.
-
-- Coding harness: personality, behavior, rules, safety constraints
-- `~/.claude/AGENTS.md` — personal preferences across all projects
-- `.claude/AGENTS.md` — repo-specific instructions:
-  - dev commands
-  - conventions
-  - coding style
-  - rough repo map
-
-**Keep small. Update only when model consistently makes mistakes.**
-
----
-
-## How It Works
-
-![](diagrams/svgs/how-it-works.svg)
-
-1. You describe the task in natural language
-2. The model plans and issues **tool calls** (read files, run commands, edit code)
-3. Results feed back into the model's context
-4. The loop repeats until the task is done
-
----
-
-## Configuration Levels
-
-![w:300 center](diagrams/svgs/config-levels.svg)
-
-- **System** — model behavior, built-in tools, safety rules
-- **User** — personal preferences across all projects
-- **Project** — repo-specific instructions (e.g. `CLAUDE.md`, `AGENTS.md`)
+Use `Task` tool to spawn one-off subagents.
+Store reusable subagents in `.claude/agents/<agent>.md`
 
 ---
 
@@ -512,39 +501,321 @@ Provides system instructions.
 
 ---
 
-## Best Practices
+## Keep Sessions Focused
 
-- **Write good agent docs** — the model starts from scratch every session
-  - Map of the repo, build commands, conventions
-- **Plan before implementing** — brainstorm → plan → implement in phases
-- **Treat prompts as code** — version them, iterate, refine
-- **One session per task** — keep context focused
-- **Verify autonomously** — write tests first, let the agent run them
-
-> "Ask me questions before you start."
+- Model performs best when focused on one task at a time
+- One task per session
+- Limit scope
+- Dump intermediate progress into file, use it as context for next session
 
 ---
 
-## CLI Tools Comparison
+## Plan -> Implement
 
-| Tool        | Provider  | Open Source |
-|-------------|-----------|:-----------:|
-| Claude Code | Anthropic | ✓           |
-| Codex CLI   | OpenAI    | ✓           |
-| Gemini CLI  | Google    | ✓           |
-| Copilot CLI | GitHub    | ✗           |
-| OpenCode    | Community | ✓           |
-
-Pick one, invest in learning it deeply.
-Models have different personalities — it takes time to adjust.
+- State problem and ask agent to generate an implementation plan
+- Iterate on the plan until it looks good
+- Once the plan is solid, ask to execute it
+- Use **Plan Mode** or dump as PLAN.md
 
 ---
 
-## Start Small, Build Muscle
+## Plan -> Implement
 
-*Writing code is cheap. Making software is expensive.*
+- **Brainstorm** high-level specification -> SPEC.md
+- **Design** architecture and components -> DESIGN.md
+- **Task breakdown** into smaller steps -> TASKS.md
+- **Implement** each task in a separate session
+  - Reflect on challenges and deviations from the original plan in LOG.md
+- **Review** final implementation
 
-1. Identify a **friction point** in your workflow
-2. Ask the agent for help
-3. Review the output — learn what works
-4. Gradually increase autonomy
+---
+
+## Spec-Driven Development
+
+Structured workflow for building complex features.
+
+- https://github.com/bmad-code-org/BMAD-METHOD
+- https://github.com/github/spec-kit
+- https://github.com/Fission-AI/OpenSpec
+
+---
+
+## Compaction
+
+Replace conversation history with summary of the conversation.
+
+- Triggered automatically when context usage gets high
+- Triggered manually through `/compact`
+- Lossy — details are lost, only summaries remain
+- Resets the model's "working memory"
+
+---
+
+## Maintain Design Notes
+
+What:
+- Design decisions, motivation
+- Constraints
+- Challenges, lessons learned
+- Non-obvious algorithms
+
+Where:
+- `docs/design-notes.md`
+- Inline comments
+- Commit messages
+
+---
+
+## Reflect on Mistakes
+
+- "Explain why you did that mistake."
+- "What can we do to prevent such mistakes in the future?"
+- "Include it in AGENTS.md/comments/docs."
+
+---
+
+## "Ask me questions"
+
+Make sure agent fully understands the task, your preferences, scope and constraints before starting the task.
+
+"List all unknowns and ambiguities. Ask me questions to clarify them. Each question should have multiple choices, with pros/cons and your recommendation. Ask one question at a time, wait for my answer before asking the next question."
+
+---
+
+## Ask for Alternatives
+
+- Don't just ask "What is the best way to do X?"
+- Often, there are multiple valid approaches with different trade-offs
+- It may surprise you with solutions you haven't thought of
+- You may learn about new techniques and tools
+- Ask for pros/cons and recommendations to make informed decisions
+
+---
+
+## Automate Verification
+
+- When starting a task, think how agent can verify its own work
+- If don't know, ask the agent to come up with automated verification strategy
+- Manual verification is time-consuming and error-prone
+- Unit tests for components
+- End-to-end tests for overall feature
+
+---
+
+## To Vibe or Not to Vibe?
+
+> If you don't know how your code works, you can't make it work reliably
+
+- One-off, personal tools - run once and forget
+- Dev tools, shared scripts - review critical parts; tests and docs for everything else
+- Production - thorough review, tests and docs
+
+It is easier to review code that you would write yourself
+Limit scope to amount of code you are comfortable reviewing
+
+---
+
+## It Feels Slow
+
+> "But I can write this code myself in 5 minutes!"
+
+Expect to be slow at the beginning
+Speed will come with practice (precise prompts) and infrastructure (docs, tests, tools)
+
+- Less typing
+- Less web search
+- Automated exploration
+  - Codebase comprehension
+  - Brainstorming
+  - Debugging
+  - Experimenting
+- Parallel sessions
+
+---
+
+## Learning Curve
+
+- Start with the strongest model, stick to it for a while
+- Learn model's capabilities and limitations
+- Models have different "personalities", takes time to adjust
+- "Be lazy" to understand limitations
+- Rewind failed prompts, to keep context clean
+- Reword failed prompts, to learn how to communicate better with the model
+- Empathize with the agent
+
+---
+
+## Visual Reasoning
+
+- Use visual reasoning to understand and debug complex issues
+- Teach your agent to retrieve and interpret screenshots, visual data
+
+---
+
+<!-- _class: lead -->
+
+# Use Cases
+
+---
+
+## Things that are nice to have, but not high priority
+
+- One-off tools
+- Docs
+- Refactoring obsolete code
+- Tedios tasks that require no creativity, but are time consuming
+
+---
+
+## Things that are hard to automate
+
+- Data analysis and aggregation (logs, reports, metrics, email, slack, ...)
+- Debugging
+- Code review
+- git operations
+
+---
+
+## Refactoring
+
+1. Generate comprehensive high-level spec
+2. Generate tests verifying each item of spec
+3. Refactor
+4. Review
+
+---
+
+## Benchmarking
+
+1. "Propose 10 implementations of this algorithm and benchmark them against different payloads"
+2. "Save findings in LOG.md"
+3. "Read LOG.md and benchmark 10 more implementations"
+4. ...
+
+---
+
+## Debugging
+
+Debugging ROS2 Middleware.
+
+1. "Tell me what's wrong"
+2. "Here is my set up, run 10 experiments"
+3. "Save findings in LOG.md"
+4. "Read LOG.md and do 10 more experiments"
+...
+5. "Here is the source code of middleware"
+6. "Create patch"
+
+---
+
+## Autonomous Research
+
+https://github.com/karpathy/autoresearch
+
+---
+
+## Microsoft Copilot Cowork, Claude Cowork, Codex App
+
+- Cleaning up calendar
+- Rescheduling meetings
+- Reading/editing documents
+- Making slides/report
+
+---
+
+## Agentic Workflows
+
+- Encode structured, predictable parts into executable scripts
+- Leave AI only the hard-to-automate, unpredictable parts
+
+---
+
+<!-- _class: lead -->
+
+# Models & Providers
+
+---
+
+## Providers
+
+- Anthropic: Opus 4.6, Sonnet 4.6
+- OpenAI: GPT 5.4, GPT 5.3 Codex
+- Google: Gemini 3 Flash/Pro
+- Z.AI: GLM 5
+- MiniMax: MiniMax M2.5
+
+Tiered subscriptions: Free, Entry, Pro, Enterprise
+5-hour/daily/weekly quotas
+Subscription tokens are N times cheaper than pay-as-you-go
+
+---
+
+## Aggregators
+
+- Cursor
+- Augment Code
+- GitHub Copilot
+- OpenRouter
+
+---
+
+## My Recommendations
+
+- Beginner: OpenAI 20$
+- Anthropic 100$
+- OpenAI or Anthropic 200$
+- Cheap: GLM-5 30$ or Gemini Flash 20$
+
+---
+
+## Benchmarks
+
+https://artificialanalysis.ai/
+
+- Intelligence
+- Cost
+- Token efficiency
+- Hallucination rate
+
+---
+
+<!-- _class: lead -->
+
+# Tooling
+
+---
+
+## Tools
+
+- Claude Code
+- OpenCode
+- Codex CLI
+- Gemini CLI
+- Copilot CLI
+- many more...
+
+https://github.com/numtide/llm-agents.nix
+
+---
+
+## Editors
+
+VS Code Extensions
+- Claude Code
+- Codex
+- Kilo
+- Copilot
+
+Cursor
+Antigravity
+
+---
+
+# Takeaways
+
+- Identify friction points and ask "How can you help me?"
+- Know your context
+  - Wrong context
+  - Context rot
+- Automate verification
+- Read generated code
