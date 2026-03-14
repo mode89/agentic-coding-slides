@@ -81,6 +81,311 @@ section { text-align: center; align-content: center; padding: 0 60px; }
 
 ---
 
+<style scoped>
+section {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  padding: 100px 60px 60px;
+}
+pre {
+  flex: 1;
+  font-size: 0.6em;
+  margin: 0;
+  height: 500px;
+}
+</style>
+
+## Simple Chat
+
+```
+curl openrouter.ai/api/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $OPENROUTER_API_KEY" \
+  -d '{
+    "model": "google/gemini-2.5-flash",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Hi there."
+      }
+    ]
+  }'
+```
+
+```
+{
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "Hi! How can I help you today?"
+      }
+    }
+  ]
+}
+```
+
+---
+
+<style scoped>
+section {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  padding: 100px 60px 60px;
+}
+pre {
+  flex: 1;
+  font-size: 0.6em;
+  margin: 0;
+  height: 500px;
+}
+.hl {
+  font-weight: bold;
+}
+</style>
+
+## Simple Chat
+
+<pre><code>curl openrouter.ai/api/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $OPENROUTER_API_KEY" \
+  -d '{
+    "model": "google/gemini-2.5-flash",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Hi there."
+      },
+      <span class="hl">{
+        "role": "assistant",
+        "content": "Hi! How can I help you today?"
+      },
+      {
+        "role": "user",
+        "content": "What is the capital of France?"
+      }</span>
+    ]
+  }'</code></pre>
+
+```
+{
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "It is Paris."
+      }
+    }
+  ]
+}
+```
+
+---
+
+<style scoped>
+section {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  padding: 100px 60px 60px;
+}
+pre {
+  flex: 1;
+  font-size: 0.6em;
+  margin: 0;
+  height: 500px;
+}
+.hl {
+  font-weight: bold;
+}
+</style>
+
+## Tool Use
+
+<pre><code>{
+  <span class="hl">"tools": [
+    {
+      "name": "shell",
+      "description": "Run a shell command.",
+      "parameters": {
+        "command": { "type": "string" }
+      }
+    }
+  ],</span>
+  "messages": [
+    {
+      "role": "user",
+      "content": "List files in current directory."
+    }
+  ]
+}</code></pre>
+
+```
+{
+  "finish_reason": "tool_calls",
+  "message": {
+    "tool_calls": [
+      {
+        "name": "shell",
+        "arguments": { "command": "ls -F" }
+      }
+    ]
+  }
+}
+```
+
+---
+
+<style scoped>
+section {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  padding: 100px 60px 60px;
+}
+pre {
+  flex: 1;
+  font-size: 0.6em;
+  margin: 0;
+  height: 500px;
+}
+.hl {
+  font-weight: bold;
+}
+</style>
+
+## Tool Use
+
+<pre><code>{
+  "tools": [ ... ],
+  "messages": [
+    {
+      "role": "user",
+      "content": "List files in current directory."
+    },
+    <span class="hl">{
+      "role": "assistant",
+      "tool_calls": [
+        {
+          "name": "shell",
+          "arguments": { "command": "ls -F" }
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": "CLAUDE.md PLAN.md SLIDES.md"
+    }</span>
+  ]
+}</code></pre>
+
+```
+{
+  "finish_reason": "stop",
+  "message": {
+    "role": "assistant",
+    "content": "
+      Here is content of current directory:
+      - CLAUDE.md
+      - PLAN.md
+      - SLIDES.md
+    "
+  }
+}
+```
+
+---
+
+<style scoped>
+section {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  padding: 100px 60px 60px;
+}
+pre {
+  flex: 1;
+  font-size: 0.6em;
+  margin: 0;
+  height: 500px;
+}
+.hl {
+  font-weight: bold;
+}
+</style>
+
+## System Instructions
+
+<pre><code>{
+  "messages": [
+    <span class="hl">{
+      "role": "system",
+      "content": "
+        You are a helpful assistant,
+        called Sauron.
+      "
+    },</span>
+    {
+      "role": "user",
+      "content": "Who are you?"
+    }
+  ]
+}</code></pre>
+
+```
+{
+  "message": {
+    "role": "assistant",
+    "content": "
+      I am Sauron, your helpful assistant.
+      One does not simply walk into Mordor,
+      but one can simply ask me anything.
+    "
+  }
+}
+```
+
+---
+
+## Agentic Loop
+
+```python
+while True:
+    history.append(user_prompt())
+    while True:
+        response = inference(history, tools, system_instructions)
+        history.append(response)
+        if not response.get("tool_calls"): break
+        for tool_call in msg["tool_calls"]:
+            tool_result = execute(tool_call)
+            history.append(tool_result)
+```
+
+- Get user input
+- Run inference with full context
+- Execute tool calls until no more are issued
+
+---
+
+## Context
+
+**Includes**
+
+- System instructions
+- Tool definitions
+- Complete conversation history
+
+**Context Window**
+
+- Amount of information the model can consider at once
+- Limited by model architecture
+- 200k - 1M tokens
+- 1 token ~ 3 characters of code
+
+---
+
 ## How It Works
 
 ![](diagrams/svgs/how-it-works.svg)
