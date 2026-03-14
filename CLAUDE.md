@@ -16,6 +16,7 @@ little or no experience in agentic coding.
 - Keep slides concise — prefer visuals and bullet points over walls of text
 - Use Mermaid for diagrams (see Diagrams section below)
 - Use plain, jargon-light language appropriate for the target audience
+- Make sure markdown table column separators (`|`) are vertically aligned
 
 ## Diagrams
 

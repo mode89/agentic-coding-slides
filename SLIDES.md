@@ -111,13 +111,13 @@ Agentic coding is using AI coding agents to automate software development tasks.
 
 ## CLI Tools Comparison
 
-| Tool | Provider | Open Source |
-|------|----------|:-----------:|
-| Claude Code | Anthropic | ✓ |
-| Codex CLI | OpenAI | ✓ |
-| Gemini CLI | Google | ✓ |
-| Copilot CLI | GitHub | ✗ |
-| OpenCode | Community | ✓ |
+| Tool        | Provider  | Open Source |
+|-------------|-----------|:-----------:|
+| Claude Code | Anthropic | ✓           |
+| Codex CLI   | OpenAI    | ✓           |
+| Gemini CLI  | Google    | ✓           |
+| Copilot CLI | GitHub    | ✗           |
+| OpenCode    | Community | ✓           |
 
 Pick one, invest in learning it deeply.
 Models have different personalities — it takes time to adjust.
