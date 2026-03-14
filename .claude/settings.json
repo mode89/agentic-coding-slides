@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(nix-shell --run *mmdc*)",
+      "Bash(nix-shell --run *scripts/render-slide*)",
+      "Bash(ls *)"
+    ]
+  }
+}
