@@ -67,6 +67,14 @@ Agentic coding is using AI coding agents to automate software development tasks.
 
 ---
 
+<style scoped>
+section { text-align: center; align-content: center; padding: 0 60px; }
+</style>
+
+![w:500](diagrams/claude.png) ![w:500](diagrams/opencode.png)
+
+---
+
 <!-- _class: lead -->
 
 # Under the Hood
@@ -75,7 +83,7 @@ Agentic coding is using AI coding agents to automate software development tasks.
 
 ## How It Works
 
-![How it works](diagrams/svgs/how-it-works.svg)
+![](diagrams/svgs/how-it-works.svg)
 
 1. You describe the task in natural language
 2. The model plans and issues **tool calls** (read files, run commands, edit code)
@@ -86,7 +94,7 @@ Agentic coding is using AI coding agents to automate software development tasks.
 
 ## Configuration Levels
 
-![w:300 center Config levels](diagrams/svgs/config-levels.svg)
+![w:300 center](diagrams/svgs/config-levels.svg)
 
 - **System** — model behavior, built-in tools, safety rules
 - **User** — personal preferences across all projects
