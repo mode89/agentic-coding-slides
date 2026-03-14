@@ -1,0 +1,112 @@
+#!/usr/bin/env python3
+"""Render a single slide from a Marp file to an image.
+
+Usage:
+  render-slide --index 2 <slides.md>
+  render-slide --search "keyword" <slides.md>
+"""
+
+import argparse
+import subprocess
+import sys
+from pathlib import Path
+
+
+TEMP_DIR = Path(".temp/images")
+SEPARATOR = "\n---\n"
+
+
+def main():  # pylint: disable=missing-function-docstring
+    parser = argparse.ArgumentParser(
+        description="Render a single Marp slide to an image.",
+    )
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument(
+        "--index", type=int, help="Slide number (1-based)",
+    )
+    group.add_argument(
+        "--search", type=str,
+        help="Keyword to find in slide content",
+    )
+    parser.add_argument("file", type=Path, help="Path to the Marp slides file")
+    args = parser.parse_args()
+
+    if not args.file.exists():
+        sys.exit(f"Error: file not found: {args.file}")
+
+    _, slides = parse_slides(args.file)
+
+    if not slides:
+        sys.exit("Error: no slides found (expected --- separators)")
+
+    if args.index is not None:
+        matches = find_by_index(slides, args.index)
+    else:
+        matches = find_by_search(slides, args.search)
+
+    if not matches:
+        sys.exit(f"Error: no slides matching '{args.search}'")
+
+    if len(matches) > 1:
+        print("Multiple matching slides:", file=sys.stderr)
+        for i in matches:
+            print(f"  {i + 1}: {slide_preview(slides[i])}", file=sys.stderr)
+        sys.exit(1)
+
+    render(args.file, matches[0])
+
+
+def parse_slides(path):
+    """Split a Marp file into frontmatter + individual slides."""
+    text = path.read_text()
+    parts = text.split(SEPARATOR)
+    frontmatter = parts[0]
+    slides = parts[1:] if len(parts) > 1 else []
+    return frontmatter, slides
+
+
+def find_by_index(slides, index):
+    """Return matching indices for a 1-based slide index."""
+    if index < 1 or index > len(slides):
+        sys.exit(f"Error: slide index {index} out of range (1–{len(slides)})")
+    return [index - 1]
+
+
+def find_by_search(slides, keyword):
+    """Return indices of slides containing the keyword."""
+    keyword_lower = keyword.lower()
+    return [i for i, s in enumerate(slides) if keyword_lower in s.lower()]
+
+
+def slide_preview(slide, max_words=8):
+    """Return the first few words of a slide for display."""
+    words = slide.split()
+    preview = " ".join(words[:max_words])
+    if len(words) > max_words:
+        preview += " …"
+    return preview
+
+
+def render(slides_path, slide_idx):
+    """Render the target slide to an image using Marp."""
+    TEMP_DIR.mkdir(parents=True, exist_ok=True)
+
+    output = TEMP_DIR / "slide.png"
+    subprocess.run(
+        [
+            "marp", str(slides_path),
+            "--images", "png",
+            "--allow-local-files",
+            "--output", str(output),
+        ],
+        check=True,
+        capture_output=True,
+    )
+
+    # marp produces <name>.NNN.png for each slide; find the target one
+    target = output.with_suffix(f".{slide_idx + 1:03d}.png")
+    print(target)
+
+
+if __name__ == "__main__":
+    main()
