@@ -39,6 +39,10 @@ style: |
   table {
     font-size: 0.85em;
   }
+  img[alt~="center"] {
+    display: block;
+    margin: 0 auto;
+  }
 ---
 
 <!-- _class: lead invert -->
@@ -82,7 +86,7 @@ Agentic coding is using AI coding agents to automate software development tasks.
 
 ## Configuration Levels
 
-![w:300 Config levels](diagrams/svgs/config-levels.svg)
+![w:300 center Config levels](diagrams/svgs/config-levels.svg)
 
 - **System** — model behavior, built-in tools, safety rules
 - **User** — personal preferences across all projects
