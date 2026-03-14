@@ -386,6 +386,105 @@ while True:
 
 ---
 
+## Compaction
+
+**Context rot**: as conversation history grows, model starts losing track of earlier information, leading to mistakes and hallucinations.
+
+**Compaction** summarizes current chat history to free up space while preserving key information.
+
+- Automatic — triggered when context usage gets high
+- Lossy — details are lost, only summaries remain
+- Resets the model's "working memory"
+
+---
+
+## Slash Commands
+
+Some tools can be invoked directly from the user prompt using slash commands.
+
+- `/clear` — reset conversation history
+- `/compact` — trigger compaction manually
+- `/rewind` — undo recent messages to recover context
+- `/resume` — resume an old session
+
+---
+
+## Custom Slash Commands
+
+Reusable prompts can be defined as custom slash commands.
+
+- `.claude/commands/<command>.md`
+
+Example: `/commit`
+
+```markdown
+---
+description: Commit modified files
+---
+
+- Extract diff of modified files
+- Propose commit message
+- Ask for confirmation
+- Stage and commit changes
+```
+
+---
+
+## Skills
+
+Instructions for specific tasks that can be invoked by the model when relevant.
+
+```
+.claude/skills/<skill>/
+  SKILL.md
+  references/
+  scripts/
+```
+
+`SKILL.md` appended to the context only when model decides it is relevant.
+
+Example: `.claude/skills/rosbag2/SKILL.md`
+
+```markdown
+---
+description: Instructions for working with rosbag2 files.
+---
+
+rosbag2 is a tool for ...
+```
+
+---
+
+## Subagents
+
+Subagents are separate agentic sessions with their own context.
+
+The main agent can spawn subagents for specific subtasks, then read their results.
+
+Examples:
+- Codebase exploration
+- Execution of multiple smaller tasks
+- Reading documentation
+- Summarizing long outputs
+
+---
+
+## AGENTS.md
+
+Provides system instructions.
+
+- Coding harness: personality, behavior, rules, safety constraints
+- `~/.claude/AGENTS.md` — personal preferences across all projects
+- `.claude/AGENTS.md` — repo-specific instructions:
+  - dev commands
+  - conventions
+  - coding style
+  - rough repo map
+
+**Keep small. Update only when model consistently makes mistakes.**
+
+---
+
 ## How It Works
 
 ![](diagrams/svgs/how-it-works.svg)
