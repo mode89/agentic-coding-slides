@@ -13,7 +13,6 @@ from pathlib import Path
 
 
 TEMP_DIR = Path(".temp/images")
-SEPARATOR = "\n---\n"
 
 
 def main():  # pylint: disable=missing-function-docstring
@@ -57,11 +56,34 @@ def main():  # pylint: disable=missing-function-docstring
 
 
 def parse_slides(path):
-    """Split a Marp file into frontmatter + individual slides."""
-    text = path.read_text()
-    parts = text.split(SEPARATOR)
-    frontmatter = parts[0]
-    slides = parts[1:] if len(parts) > 1 else []
+    """Split a Marp file into frontmatter + individual slides.
+
+    Handles YAML frontmatter and ignores --- inside fenced code blocks.
+    """
+    lines = path.read_text().splitlines(keepends=True)
+    # Skip YAML frontmatter (opening --- must be line 1)
+    start = 0
+    if lines and lines[0].strip() == "---":
+        for i, line in enumerate(lines[1:], 1):
+            if line.strip() == "---":
+                start = i + 1
+                break
+
+    slides = []
+    current = []
+    in_fence = False
+    for line in lines[start:]:
+        stripped = line.strip()
+        if stripped.startswith("```"):
+            in_fence = not in_fence
+        if not in_fence and stripped == "---":
+            slides.append("".join(current))
+            current = []
+        else:
+            current.append(line)
+    slides.append("".join(current))
+
+    frontmatter = "".join(lines[:start])
     return frontmatter, slides
 
 
